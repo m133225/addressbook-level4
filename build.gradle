@@ -39,14 +39,13 @@ allprojects {
         guavaVersion = '19.0'
         jacksonVersion = '2.7.0'
         jacksonDataTypeVersion = '2.7.4'
-        jKeyMasterVersion = '1.2'
         junitVersion = '4.12'
         log4jVersion = '2.6'
-        testFxVersion = '3.1.0'
         monocleVersion = '1.8.0_20'
-        slf4jSimpleVersion = '1.6.4'
 
         libDir = 'lib'
+        appMainClass = 'seedu.address.MainApp'
+        appArchiveName = 'addressbook.jar'
     }
 
     jacocoTestReport {
@@ -60,7 +59,6 @@ allprojects {
     dependencies {
         compile "org.apache.logging.log4j:log4j-api:$log4jVersion"
         compile "org.apache.logging.log4j:log4j-core:$log4jVersion"
-        compile "org.slf4j:slf4j-simple:$slf4jSimpleVersion" // Required to suppress warning, for jkeymaster, see http://www.slf4j.org/codes.html#StaticLoggerBinder
         compile "org.controlsfx:controlsfx:$controlsFxVersion"
         compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
         compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDataTypeVersion"
@@ -74,6 +72,24 @@ allprojects {
         }
         testCompile "org.testfx:openjfx-monocle:$monocleVersion"
     }
+
+    // Copy downloaded dependencies from Gradle's cache into the library directory
+    task copyAllDependenciesToLibrary(type: Copy) {
+        from configurations.compile
+        into "${buildDir}/libs/$libDir"
+    }
+    copyAllDependenciesToLibrary.dependsOn clean
+
+    jar {
+        archiveName = "$appArchiveName"
+
+        manifest {
+            attributes "Main-Class": "$appMainClass",
+                       "Class-Path": configurations.runtime.files.collect { "$libDir/${it.name}" }.join(" ") // required for DependencyChecker
+        }
+        from sourceSets.main.output
+    }
+    jar.dependsOn copyAllDependenciesToLibrary
 }
 
 task wrapper(type: Wrapper) {
@@ -107,7 +123,7 @@ task checkStyle { // A dummy task to run a set of tasks
 
 class AddressBookTest extends Test {
     public AddressBookTest() {
-    	  forkEvery = 1
+        forkEvery = 1
         systemProperty 'testfx.setup.timeout', '60000'
     }
 

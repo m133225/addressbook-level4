@@ -1,13 +1,9 @@
 package seedu.address.util;
 
-import seedu.address.MainApp;
 import seedu.address.exceptions.DependencyCheckException;
 import seedu.address.commons.FileUtil;
-import seedu.address.commons.JsonUtil;
-import seedu.address.commons.VersionData;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +18,7 @@ public class DependencyChecker {
     private final String requiredJavaVersionString;
     private Runnable quitApp;
 
-    public  DependencyChecker(String requiredJavaVersionString, Runnable quitApp) {
+    public DependencyChecker(String requiredJavaVersionString, Runnable quitApp) {
         this.requiredJavaVersionString = requiredJavaVersionString;
         this.quitApp = quitApp;
     }
@@ -105,31 +101,8 @@ public class DependencyChecker {
 
         List<String> dependencies = dependenciesWrapper.get();
 
-        excludePlatformSpecificDependencies(dependencies);
-
         return dependencies.stream()
                 .filter(dependency -> !FileUtil.isFileExists(dependency)).collect(Collectors.toList());
-    }
-
-    private void excludePlatformSpecificDependencies(List<String> dependencies) {
-        String json = FileUtil.readFromInputStream(MainApp.class.getResourceAsStream("/VersionData.json"));
-
-        seedu.address.commons.VersionData versionData;
-
-        try {
-            versionData = JsonUtil.fromJsonString(json, VersionData.class);
-        } catch (IOException e) {
-            logger.warn("Failed to parse JSON data to process platform specific dependencies", e);
-            return;
-        }
-
-        List<String> librariesNotForCurrentMachine =  versionData.getLibraries().stream()
-                .filter(libDesc -> libDesc.getOs() != seedu.address.commons.OsDetector.Os.ANY
-                                    && libDesc.getOs() != seedu.address.commons.OsDetector.getOs())
-                .map(libDesc -> "lib/" + libDesc.getFileName())
-                .collect(Collectors.toList());
-
-        dependencies.removeAll(librariesNotForCurrentMachine);
     }
 
     public void showErrorDialogAndQuit(String title, String headerText, String contentText) {
