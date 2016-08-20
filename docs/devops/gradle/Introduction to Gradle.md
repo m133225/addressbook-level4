@@ -4,7 +4,7 @@
 [Gradle](https://gradle.org/) is an integration technology that addressbook uses for:
 - building the application JAR
 - handling project dependencies
-- testing (including coverage of test cases)
+- [testing](./Testing.md) (including coverage of test cases)
 - checking for bugs & code style violations
 - continuous integration
 
@@ -22,10 +22,10 @@ See Gradle's [Java Plugin](https://docs.gradle.org/current/userguide/java_plugin
 To manage dependencies, we simply have to define [maven repositories](https://maven.apache.org/guides/introduction/introduction-to-repositories.html) in `build.gradle` to download each of them.
 This will allow us to avoid adding dependencies into the repository.
 - Consistent version of dependencies between developers
-- If there are updates to the dependencies, developers will be able to download the latest versions (only if specified in the script) without having to update the script
+- Developers will be able to download the latest versions of the dependencies without having to update the script
 - Less bloated repository
 
-The following tasks are related to ensuring that the required dependencies are downloaded and used.
+The following tasks are related to ensuring that the required dependencies are downloaded and used:
 
 #### `compileJava`
 `assemble`, `build`, `jar` are **examples** of tasks that will call `compileJava`.
