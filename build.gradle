@@ -4,6 +4,10 @@
  * For more details take a look at the Java Quickstart chapter in the Gradle
  * user guide available at http://gradle.org/docs/2.2.1/userguide/tutorial_java_projects.html
  */
+ 
+ plugins {
+    id "com.github.kt3k.coveralls" version "2.4.0"
+}
 
 allprojects {
     version = 'V1.6.1ea'
@@ -159,6 +163,16 @@ task headless << {
     allTests.setHeadless()
 }
 
+
+coveralls {
+    sourceDirs = allprojects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/coverage/coverage.xml"
+}
+
+tasks.coveralls {
+    dependsOn coverage
+    onlyIf { System.env.'CI' }
+}
 
 
 // Makes sure that headless properties are set before running tests
